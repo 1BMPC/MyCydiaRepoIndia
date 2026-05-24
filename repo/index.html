@@ -87,20 +87,19 @@ body {
   background: rgba(255,255,255,0.9);
 }
 
-.ios-spinner-spoke:nth-child(1)  { -webkit-transform: rotate(0deg);   transform: rotate(0deg);   -webkit-animation: fade-spoke 1s 0s linear infinite;      animation: fade-spoke 1s 0s linear infinite; }
-.ios-spinner-spoke:nth-child(2)  { -webkit-transform: rotate(30deg);  transform: rotate(30deg);  -webkit-animation: fade-spoke 1s -0.917s linear infinite;  animation: fade-spoke 1s -0.917s linear infinite; }
-.ios-spinner-spoke:nth-child(3)  { -webkit-transform: rotate(60deg);  transform: rotate(60deg);  -webkit-animation: fade-spoke 1s -0.833s linear infinite;  animation: fade-spoke 1s -0.833s linear infinite; }
-.ios-spinner-spoke:nth-child(4)  { -webkit-transform: rotate(90deg);  transform: rotate(90deg);  -webkit-animation: fade-spoke 1s -0.75s linear infinite;   animation: fade-spoke 1s -0.75s linear infinite; }
-.ios-spinner-spoke:nth-child(5)  { -webkit-transform: rotate(120deg); transform: rotate(120deg); -webkit-animation: fade-spoke 1s -0.667s linear infinite;  animation: fade-spoke 1s -0.667s linear infinite; }
-.ios-spinner-spoke:nth-child(6)  { -webkit-transform: rotate(150deg); transform: rotate(150deg); -webkit-animation: fade-spoke 1s -0.583s linear infinite;  animation: fade-spoke 1s -0.583s linear infinite; }
-.ios-spinner-spoke:nth-child(7)  { -webkit-transform: rotate(180deg); transform: rotate(180deg); -webkit-animation: fade-spoke 1s -0.5s linear infinite;    animation: fade-spoke 1s -0.5s linear infinite; }
-.ios-spinner-spoke:nth-child(8)  { -webkit-transform: rotate(210deg); transform: rotate(210deg); -webkit-animation: fade-spoke 1s -0.417s linear infinite;  animation: fade-spoke 1s -0.417s linear infinite; }
-.ios-spinner-spoke:nth-child(9)  { -webkit-transform: rotate(240deg); transform: rotate(240deg); -webkit-animation: fade-spoke 1s -0.333s linear infinite;  animation: fade-spoke 1s -0.333s linear infinite; }
-.ios-spinner-spoke:nth-child(10) { -webkit-transform: rotate(270deg); transform: rotate(270deg); -webkit-animation: fade-spoke 1s -0.25s linear infinite;   animation: fade-spoke 1s -0.25s linear infinite; }
-.ios-spinner-spoke:nth-child(11) { -webkit-transform: rotate(300deg); transform: rotate(300deg); -webkit-animation: fade-spoke 1s -0.167s linear infinite;  animation: fade-spoke 1s -0.167s linear infinite; }
-.ios-spinner-spoke:nth-child(12) { -webkit-transform: rotate(330deg); transform: rotate(330deg); -webkit-animation: fade-spoke 1s -0.083s linear infinite;  animation: fade-spoke 1s -0.083s linear infinite; }
+.ios-spinner-spoke:nth-child(1)  { -webkit-transform: rotate(0deg); transform: rotate(0deg); animation: fade-spoke 1s 0s linear infinite; }
+.ios-spinner-spoke:nth-child(2)  { -webkit-transform: rotate(30deg); transform: rotate(30deg); animation: fade-spoke 1s -0.917s linear infinite; }
+.ios-spinner-spoke:nth-child(3)  { -webkit-transform: rotate(60deg); transform: rotate(60deg); animation: fade-spoke 1s -0.833s linear infinite; }
+.ios-spinner-spoke:nth-child(4)  { -webkit-transform: rotate(90deg); transform: rotate(90deg); animation: fade-spoke 1s -0.75s linear infinite; }
+.ios-spinner-spoke:nth-child(5)  { -webkit-transform: rotate(120deg); transform: rotate(120deg); animation: fade-spoke 1s -0.667s linear infinite; }
+.ios-spinner-spoke:nth-child(6)  { -webkit-transform: rotate(150deg); transform: rotate(150deg); animation: fade-spoke 1s -0.583s linear infinite; }
+.ios-spinner-spoke:nth-child(7)  { -webkit-transform: rotate(180deg); transform: rotate(180deg); animation: fade-spoke 1s -0.5s linear infinite; }
+.ios-spinner-spoke:nth-child(8)  { -webkit-transform: rotate(210deg); transform: rotate(210deg); animation: fade-spoke 1s -0.417s linear infinite; }
+.ios-spinner-spoke:nth-child(9)  { -webkit-transform: rotate(240deg); transform: rotate(240deg); animation: fade-spoke 1s -0.333s linear infinite; }
+.ios-spinner-spoke:nth-child(10) { -webkit-transform: rotate(270deg); transform: rotate(270deg); animation: fade-spoke 1s -0.25s linear infinite; }
+.ios-spinner-spoke:nth-child(11) { -webkit-transform: rotate(300deg); transform: rotate(300deg); animation: fade-spoke 1s -0.167s linear infinite; }
+.ios-spinner-spoke:nth-child(12) { -webkit-transform: rotate(330deg); transform: rotate(330deg); animation: fade-spoke 1s -0.083s linear infinite; }
 
-@-webkit-keyframes fade-spoke { 0% { opacity: 1; } 100% { opacity: 0.1; } }
 @keyframes fade-spoke { 0% { opacity: 1; } 100% { opacity: 0.1; } }
 
 .loading-label {
@@ -108,12 +107,10 @@ body {
   color: #fff;
   margin-top: 10px;
   text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-  -webkit-text-shadow: 0 1px 3px rgba(0,0,0,0.6);
 }
 
 #main {
   opacity: 0;
-  -webkit-transition: opacity 0.4s ease;
   transition: opacity 0.4s ease;
 }
 
@@ -139,17 +136,12 @@ body {
 }
 
 .table-cell {
-  display: -webkit-box;
-  display: -webkit-flex;
   display: flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
   align-items: center;
   padding: 0 16px;
   height: 44px;
   background: #fff;
   position: relative;
-  -webkit-user-select: none;
   user-select: none;
   cursor: pointer;
 }
@@ -171,7 +163,6 @@ body {
   height: 29px;
   border-radius: 7px;
   margin-right: 12px;
-  -webkit-flex-shrink: 0;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -187,7 +178,6 @@ body {
   height: 50px;
   border-radius: 11px;
   margin-right: 12px;
-  -webkit-flex-shrink: 0;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -198,17 +188,7 @@ body {
   display: block;
 }
 
-.repo-header-cell {
-  height: 60px;
-}
-
-.repo-header-cell + .table-cell::before {
-  left: 16px;
-}
-
 .cell-content {
-  -webkit-box-flex: 1;
-  -webkit-flex: 1;
   flex: 1;
   overflow: hidden;
 }
@@ -231,14 +211,10 @@ body {
 .cell-arrow {
   width: 8px;
   height: 13px;
-  -webkit-flex-shrink: 0;
   flex-shrink: 0;
   margin-left: 6px;
   opacity: 0.28;
 }
-
-.url-cell { cursor: default; }
-.url-cell + .table-cell::before { left: 16px; }
 
 .table-footer {
   font-size: 12px;
@@ -276,8 +252,10 @@ body {
   <div class="section">
     <div class="section-header">Repository</div>
     <div class="table-view">
-      <div class="table-cell repo-header-cell">
-        <div class="repo-icon-large"><img src="/repo/CydiaIcon.png" alt="Repo Icon"></div>
+      <div class="table-cell">
+        <div class="repo-icon-large">
+          <img src="/repo/CydiaIcon.png" alt="Repo Icon">
+        </div>
         <div class="cell-content">
           <div class="cell-title">MyPayIndia Repo</div>
           <div class="cell-subtitle">The official MyPayIndia Cydia Repo</div>
@@ -289,9 +267,9 @@ body {
   <div class="section">
     <div class="section-header">Repository URL</div>
     <div class="table-view">
-      <div class="table-cell url-cell">
+      <div class="table-cell">
         <div class="cell-content">
-          <div class="cell-title">/repo</div>
+          <div class="cell-title">https://cydia.mypayindia.com/repo</div>
         </div>
       </div>
     </div>
@@ -306,9 +284,6 @@ body {
         <div class="cell-content">
           <div class="cell-title cell-title-blue">Add to Cydia</div>
         </div>
-        <svg class="cell-arrow" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 1l6 5.5L1 12" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
       </div>
 
       <div class="table-cell" onclick="addToSileo()">
@@ -316,9 +291,6 @@ body {
         <div class="cell-content">
           <div class="cell-title cell-title-blue">Add to Sileo</div>
         </div>
-        <svg class="cell-arrow" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 1l6 5.5L1 12" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
       </div>
 
       <div class="table-cell" onclick="addToZebra()">
@@ -326,9 +298,6 @@ body {
         <div class="cell-content">
           <div class="cell-title cell-title-blue">Add to Zebra</div>
         </div>
-        <svg class="cell-arrow" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 1l6 5.5L1 12" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
       </div>
 
     </div>
@@ -339,18 +308,21 @@ body {
 </div>
 
 <script>
-var REPO = "/repo";
+var REPO = "https://cydia.mypayindia.com/repo";
 
 function addToCydia() {
-  window.location.href = "cydia://url/https://cydia.saurik.com/api/share#?source=" + encodeURIComponent(REPO);
+  window.location.href =
+    "cydia://url/https://cydia.saurik.com/api/share#?source=" + encodeURIComponent(REPO);
 }
 
 function addToSileo() {
-  window.location.href = "sileo://source/" + encodeURIComponent(REPO);
+  window.location.href =
+    "sileo://source/" + encodeURIComponent(REPO);
 }
 
 function addToZebra() {
-  window.location.href = "zbra://sources/add/" + encodeURIComponent(REPO);
+  window.location.href =
+    "zbra://sources/add/" + encodeURIComponent(REPO);
 }
 
 window.onload = function() {
