@@ -81,6 +81,19 @@ body {
 
 @keyframes fade-spoke { 0% { opacity: 1; } 100% { opacity: 0.1; } }
 
+.ios-spinner-spoke:nth-child(1)  { transform: rotate(0deg);   animation: fade-spoke 1s 0s linear infinite; }
+.ios-spinner-spoke:nth-child(2)  { transform: rotate(30deg);  animation: fade-spoke 1s -0.917s linear infinite; }
+.ios-spinner-spoke:nth-child(3)  { transform: rotate(60deg);  animation: fade-spoke 1s -0.833s linear infinite; }
+.ios-spinner-spoke:nth-child(4)  { transform: rotate(90deg);  animation: fade-spoke 1s -0.75s linear infinite; }
+.ios-spinner-spoke:nth-child(5)  { transform: rotate(120deg); animation: fade-spoke 1s -0.667s linear infinite; }
+.ios-spinner-spoke:nth-child(6)  { transform: rotate(150deg); animation: fade-spoke 1s -0.583s linear infinite; }
+.ios-spinner-spoke:nth-child(7)  { transform: rotate(180deg); animation: fade-spoke 1s -0.5s linear infinite; }
+.ios-spinner-spoke:nth-child(8)  { transform: rotate(210deg); animation: fade-spoke 1s -0.417s linear infinite; }
+.ios-spinner-spoke:nth-child(9)  { transform: rotate(240deg); animation: fade-spoke 1s -0.333s linear infinite; }
+.ios-spinner-spoke:nth-child(10) { transform: rotate(270deg); animation: fade-spoke 1s -0.25s linear infinite; }
+.ios-spinner-spoke:nth-child(11) { transform: rotate(300deg); animation: fade-spoke 1s -0.167s linear infinite; }
+.ios-spinner-spoke:nth-child(12) { transform: rotate(330deg); animation: fade-spoke 1s -0.083s linear infinite; }
+
 .loading-label {
   font-size: 13px;
   color: #fff;
@@ -137,23 +150,7 @@ body {
 
 .table-cell:active { background-color: #d9d9d9; }
 
-/* larger repo icon (as requested) */
-.repo-icon-large {
-  width: 58px;
-  height: 58px;
-  border-radius: 13px;
-  margin-right: 12px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.repo-icon-large img {
-  width: 58px;
-  height: 58px;
-  display: block;
-}
-
-/* keep other icons unchanged */
+/* FIXED ICON SIZE (matching your original style) */
 .cell-icon {
   width: 29px;
   height: 29px;
@@ -166,6 +163,21 @@ body {
 .cell-icon img {
   width: 29px;
   height: 29px;
+  display: block;
+}
+
+.repo-icon-large {
+  width: 50px;
+  height: 50px;
+  border-radius: 11px;
+  margin-right: 12px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.repo-icon-large img {
+  width: 50px;
+  height: 50px;
   display: block;
 }
 
@@ -203,12 +215,18 @@ body {
   <div id="splash-bg"></div>
   <div id="splash-overlay">
     <div class="ios-spinner">
-      <div class="ios-spinner-spoke"></div><div class="ios-spinner-spoke"></div>
-      <div class="ios-spinner-spoke"></div><div class="ios-spinner-spoke"></div>
-      <div class="ios-spinner-spoke"></div><div class="ios-spinner-spoke"></div>
-      <div class="ios-spinner-spoke"></div><div class="ios-spinner-spoke"></div>
-      <div class="ios-spinner-spoke"></div><div class="ios-spinner-spoke"></div>
-      <div class="ios-spinner-spoke"></div><div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
+      <div class="ios-spinner-spoke"></div>
     </div>
     <div class="loading-label">Loading&hellip;</div>
   </div>
@@ -248,17 +266,23 @@ body {
 
       <div class="table-cell" onclick="addToCydia()">
         <div class="cell-icon"><img src="/assets/Cydia.png" alt="Cydia"></div>
-        <div class="cell-content"><div class="cell-title cell-title-blue">Add to Cydia</div></div>
+        <div class="cell-content">
+          <div class="cell-title cell-title-blue">Add to Cydia</div>
+        </div>
       </div>
 
       <div class="table-cell" onclick="addToSileo()">
         <div class="cell-icon"><img src="/assets/Sileo.png" alt="Sileo"></div>
-        <div class="cell-content"><div class="cell-title cell-title-blue">Add to Sileo</div></div>
+        <div class="cell-content">
+          <div class="cell-title cell-title-blue">Add to Sileo</div>
+        </div>
       </div>
 
       <div class="table-cell" onclick="addToZebra()">
         <div class="cell-icon"><img src="/assets/Zebra.png" alt="Zebra"></div>
-        <div class="cell-content"><div class="cell-title cell-title-blue">Add to Zebra</div></div>
+        <div class="cell-content">
+          <div class="cell-title cell-title-blue">Add to Zebra</div>
+        </div>
       </div>
 
     </div>
