@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Name</key>
+	<string>MyPayIndia Legacy</string>
+	<key>Description</key>
+	<string>MyPayIndia for your Legacy iOS Devices! Supports iOS 9 and higher</string>
+	<key>Maintainer</key>
+	<string>timi2506</string>
+	<key>Author</key>
+	<string>MyPayIndia &lt;devteam@mypayindia.com&gt;</string>
+	<key>Section</key>
+	<string>Applications</string>
+</dict>
+</plist>
