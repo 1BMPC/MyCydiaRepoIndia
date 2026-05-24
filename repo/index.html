@@ -38,7 +38,7 @@ body {
 #splash-bg {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-image: url('https://cydia.mypayindia.com/assets/HuhnWaschen.png');
+  background-image: url('/assets/HuhnWaschen.png');
   background-position: center center;
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -170,7 +170,6 @@ body {
   width: 29px;
   height: 29px;
   border-radius: 7px;
-  -webkit-border-radius: 7px;
   margin-right: 12px;
   -webkit-flex-shrink: 0;
   flex-shrink: 0;
@@ -187,7 +186,6 @@ body {
   width: 50px;
   height: 50px;
   border-radius: 11px;
-  -webkit-border-radius: 11px;
   margin-right: 12px;
   -webkit-flex-shrink: 0;
   flex-shrink: 0;
@@ -279,7 +277,7 @@ body {
     <div class="section-header">Repository</div>
     <div class="table-view">
       <div class="table-cell repo-header-cell">
-        <div class="repo-icon-large"><img src="https://cydia.mypayindia.com/repo/CydiaIcon.png" alt="Repo Icon"></div>
+        <div class="repo-icon-large"><img src="/repo/CydiaIcon.png" alt="Repo Icon"></div>
         <div class="cell-content">
           <div class="cell-title">MyPayIndia Repo</div>
           <div class="cell-subtitle">The official MyPayIndia Cydia Repo</div>
@@ -293,7 +291,7 @@ body {
     <div class="table-view">
       <div class="table-cell url-cell">
         <div class="cell-content">
-          <div class="cell-title">https://cydia.mypayindia.com/repo</div>
+          <div class="cell-title">/repo</div>
         </div>
       </div>
     </div>
@@ -304,7 +302,7 @@ body {
     <div class="table-view">
 
       <div class="table-cell" onclick="addToCydia()">
-        <div class="cell-icon"><img src="https://cydia.mypayindia.com/assets/Cydia.png" alt="Cydia"></div>
+        <div class="cell-icon"><img src="/assets/Cydia.png" alt="Cydia"></div>
         <div class="cell-content">
           <div class="cell-title cell-title-blue">Add to Cydia</div>
         </div>
@@ -314,7 +312,7 @@ body {
       </div>
 
       <div class="table-cell" onclick="addToSileo()">
-        <div class="cell-icon"><img src="https://cydia.mypayindia.com/assets/Sileo.png" alt="Sileo"></div>
+        <div class="cell-icon"><img src="/assets/Sileo.png" alt="Sileo"></div>
         <div class="cell-content">
           <div class="cell-title cell-title-blue">Add to Sileo</div>
         </div>
@@ -324,7 +322,7 @@ body {
       </div>
 
       <div class="table-cell" onclick="addToZebra()">
-        <div class="cell-icon"><img src="https://cydia.mypayindia.com/assets/Zebra.png" alt="Zebra"></div>
+        <div class="cell-icon"><img src="/assets/Zebra.png" alt="Zebra"></div>
         <div class="cell-content">
           <div class="cell-title cell-title-blue">Add to Zebra</div>
         </div>
@@ -341,7 +339,7 @@ body {
 </div>
 
 <script>
-var REPO = "https://cydia.mypayindia.com/repo";
+var REPO = "/repo";
 
 function addToCydia() {
   window.location.href = "cydia://url/https://cydia.saurik.com/api/share#?source=" + encodeURIComponent(REPO);
