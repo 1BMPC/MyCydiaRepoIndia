@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'input/*.app.zip'
+      - 'input/*.zip'
+      - 'input/*.app/**'
   workflow_dispatch:
 
 jobs:
@@ -17,22 +19,30 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
 
-      - name: Find app zip
-        id: find
-        run: |
-          ZIP=$(ls input/*.app.zip 2>/dev/null | head -1)
-          if [ -z "$ZIP" ]; then
-            echo "No .app.zip found in input/"
-            exit 1
-          fi
-          echo "zip=$ZIP" >> $GITHUB_OUTPUT
-
-      - name: Extract app
+      - name: Prepare app
+        id: prepare
         run: |
           mkdir -p /tmp/appextract
-          unzip -q "${{ steps.find.outputs.zip }}" -d /tmp/appextract
+          INPUT_FILE=""
+          APP_DIR=$(ls -d input/*.app 2>/dev/null | head -1)
+          
+          if [ -n "$APP_DIR" ]; then
+            cp -R "$APP_DIR" /tmp/appextract/
+            INPUT_FILE="$APP_DIR"
+          else
+            ZIP_FILE=$(ls input/*.app.zip input/*.zip 2>/dev/null | head -1)
+            if [ -n "$ZIP_FILE" ]; then
+              unzip -q "$ZIP_FILE" -d /tmp/appextract
+              INPUT_FILE="$ZIP_FILE"
+            else
+              exit 1
+            fi
+          fi
+          
           APP=$(find /tmp/appextract -maxdepth 2 -name "*.app" -type d | head -1)
           APP_NAME=$(basename "$APP" .app)
+          
+          echo "input_file=$INPUT_FILE" >> $GITHUB_OUTPUT
           echo "APP_PATH=$APP" >> $GITHUB_ENV
           echo "APP_NAME=$APP_NAME" >> $GITHUB_ENV
 
@@ -136,7 +146,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git rm "${{ steps.find.outputs.zip }}"
+          git rm -r "${{ steps.prepare.outputs.input_file }}"
           git add repo/debs/ repo/Packages repo/Packages.bz2 repo/Packages.gz repo/Packages.xz assets/latest.ipa
           git diff --cached --quiet && echo "No changes" && exit 0
           git commit -m "Build $DEB_FILENAME and latest.ipa, clean up input"
