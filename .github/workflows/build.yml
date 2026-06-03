@@ -1,4 +1,4 @@
-name: Build Deb
+name: Build IPA
 
 on:
   push:
@@ -32,89 +32,36 @@ jobs:
           mkdir -p /tmp/appextract
           unzip -q "${{ steps.find.outputs.zip }}" -d /tmp/appextract
           APP=$(find /tmp/appextract -maxdepth 2 -name "*.app" -type d | head -1)
+          APP_NAME=$(basename "$APP" .app)
           echo "APP_PATH=$APP" >> $GITHUB_ENV
-
-      - name: Read Info.plist
-        run: |
-          INFO="$APP_PATH/Info.plist"
-          BUNDLE_ID=$(defaults read "$INFO" CFBundleIdentifier 2>/dev/null || echo "")
-          VERSION=$(defaults read "$INFO" CFBundleShortVersionString 2>/dev/null || echo "")
-          APP_NAME=$(basename "$APP_PATH" .app)
-          BUNDLE_ID=${BUNDLE_ID:-com.timi2506.$APP_NAME}
-          VERSION=${VERSION:-1.0.0}
           echo "APP_NAME=$APP_NAME" >> $GITHUB_ENV
-          echo "BUNDLE_ID=$BUNDLE_ID" >> $GITHUB_ENV
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Read config.plist
+      - name: Build and Move IPA
         run: |
-          CONFIG="$(pwd)/config.plist"
-          DEB_NAME=$(defaults read "$CONFIG" Name 2>/dev/null || echo "$APP_NAME")
-          DEB_DESC=$(defaults read "$CONFIG" Description 2>/dev/null || echo "$APP_NAME application")
-          DEB_MAINTAINER=$(defaults read "$CONFIG" Maintainer 2>/dev/null || echo "timi2506")
-          DEB_AUTHOR=$(defaults read "$CONFIG" Author 2>/dev/null || echo "timi2506")
-          DEB_SECTION=$(defaults read "$CONFIG" Section 2>/dev/null || echo "Applications")
-          echo "DEB_NAME=$DEB_NAME" >> $GITHUB_ENV
-          echo "DEB_DESC=$DEB_DESC" >> $GITHUB_ENV
-          echo "DEB_MAINTAINER=$DEB_MAINTAINER" >> $GITHUB_ENV
-          echo "DEB_AUTHOR=$DEB_AUTHOR" >> $GITHUB_ENV
-          echo "DEB_SECTION=$DEB_SECTION" >> $GITHUB_ENV
-
-      - name: Install dpkg
-        run: brew install dpkg
-
-      - name: Build deb
-        run: |
-          LOWER_ID=$(echo "$BUNDLE_ID" | tr '[:upper:]' '[:lower:]')
-          DEB_FILENAME="${LOWER_ID}_${VERSION}_iphoneos-arm.deb"
-          BUILD_DIR="/tmp/deb_build"
-
-          mkdir -p "$BUILD_DIR/DEBIAN"
-          mkdir -p "$BUILD_DIR/Applications"
-
-          cat > "$BUILD_DIR/DEBIAN/control" <<EOF
-          Package: $LOWER_ID
-          Name: $DEB_NAME
-          Version: $VERSION
-          Architecture: iphoneos-arm
-          Description: $DEB_DESC
-          Maintainer: $DEB_MAINTAINER
-          Author: $DEB_AUTHOR
-          Section: $DEB_SECTION
-          Icon: https://cydia.mypayindia.com/assets/MyPayIndia-Legacy.png
-          EOF
-
-          printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$BUILD_DIR/DEBIAN/postinst"
-          printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$BUILD_DIR/DEBIAN/postrm"
-
-          cp -R "$APP_PATH" "$BUILD_DIR/Applications/"
-
-          find "$BUILD_DIR" -type d -exec chmod 0755 {} \;
-          find "$BUILD_DIR" -type f -exec chmod 0644 {} \;
-          chmod 0755 "$BUILD_DIR/DEBIAN/control"
-          chmod 0755 "$BUILD_DIR/DEBIAN/postinst"
-          chmod 0755 "$BUILD_DIR/DEBIAN/postrm"
-
-          if [ -f "$BUILD_DIR/Applications/$APP_NAME.app/$APP_NAME" ]; then
-            chmod 0755 "$BUILD_DIR/Applications/$APP_NAME.app/$APP_NAME"
+          BUILD_DIR="/tmp/ipa_build"
+          mkdir -p "$BUILD_DIR/Payload"
+          
+          cp -R "$APP_PATH" "$BUILD_DIR/Payload/"
+          
+          find "$BUILD_DIR/Payload" -type d -exec chmod 0755 {} \;
+          find "$BUILD_DIR/Payload" -type f -exec chmod 0644 {} \;
+          
+          if [ -f "$BUILD_DIR/Payload/$APP_NAME.app/$APP_NAME" ]; then
+            chmod 0755 "$BUILD_DIR/Payload/$APP_NAME.app/$APP_NAME"
           fi
 
-          dpkg-deb -Zgzip --root-owner-group -b "$BUILD_DIR" "repo/debs/$DEB_FILENAME"
-          echo "DEB_FILENAME=$DEB_FILENAME" >> $GITHUB_ENV
-
-      - name: Update Packages index
-        run: |
-          cd repo
-          dpkg-scanpackages -m ./debs > Packages
-          bzip2 -c Packages > Packages.bz2
-          gzip -c9 Packages > Packages.gz
-          xz -c9 Packages > Packages.xz
+          cd "$BUILD_DIR"
+          zip -qr latest.ipa Payload/
+          
+          cd ${{ github.workspace }}
+          mkdir -p assets
+          mv -f "$BUILD_DIR/latest.ipa" assets/latest.ipa
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add repo/debs/ repo/Packages repo/Packages.bz2 repo/Packages.gz repo/Packages.xz
+          git add assets/latest.ipa
           git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "Build $DEB_FILENAME"
+          git commit -m "Build latest.ipa"
           git push
