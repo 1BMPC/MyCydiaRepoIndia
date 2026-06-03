@@ -136,7 +136,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git rm "${{ steps.find.outputs.zip }}"
           git add repo/debs/ repo/Packages repo/Packages.bz2 repo/Packages.gz repo/Packages.xz assets/latest.ipa
           git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "Build $DEB_FILENAME and latest.ipa"
+          git commit -m "Build $DEB_FILENAME and latest.ipa, clean up input"
           git push
