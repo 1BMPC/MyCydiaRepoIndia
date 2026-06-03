@@ -75,24 +75,22 @@ jobs:
 
       - name: Build deb
         run: |
-          LOWER_ID=$(echo "$BUNDLE_ID" | tr '[:upper:]' '[:lower:]')
+          LOWER_ID=$(echo "$BUNDLE_ID" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9+._-')
           DEB_FILENAME="${LOWER_ID}_${VERSION}_iphoneos-arm.deb"
           BUILD_DIR="/tmp/deb_build"
 
           mkdir -p "$BUILD_DIR/DEBIAN"
           mkdir -p "$BUILD_DIR/Applications"
 
-          cat > "$BUILD_DIR/DEBIAN/control" <<EOF
-          Package: $LOWER_ID
-          Name: $DEB_NAME
-          Version: $VERSION
-          Architecture: iphoneos-arm
-          Description: $DEB_DESC
-          Maintainer: $DEB_MAINTAINER
-          Author: $DEB_AUTHOR
-          Section: $DEB_SECTION
-          Icon: https://cydia.mypayindia.com/assets/MyPayIndia-Legacy.png
-          EOF
+          echo "Package: $LOWER_ID" > "$BUILD_DIR/DEBIAN/control"
+          echo "Name: $DEB_NAME" >> "$BUILD_DIR/DEBIAN/control"
+          echo "Version: $VERSION" >> "$BUILD_DIR/DEBIAN/control"
+          echo "Architecture: iphoneos-arm" >> "$BUILD_DIR/DEBIAN/control"
+          echo "Description: $DEB_DESC" >> "$BUILD_DIR/DEBIAN/control"
+          echo "Maintainer: $DEB_MAINTAINER" >> "$BUILD_DIR/DEBIAN/control"
+          echo "Author: $DEB_AUTHOR" >> "$BUILD_DIR/DEBIAN/control"
+          echo "Section: $DEB_SECTION" >> "$BUILD_DIR/DEBIAN/control"
+          echo "Icon: https://cydia.mypayindia.com/assets/MyPayIndia-Legacy.png" >> "$BUILD_DIR/DEBIAN/control"
 
           printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$BUILD_DIR/DEBIAN/postinst"
           printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$BUILD_DIR/DEBIAN/postrm"
