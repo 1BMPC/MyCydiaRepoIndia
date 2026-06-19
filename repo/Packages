@@ -3,10 +3,10 @@ Version: 0.0.1
 Architecture: iphoneos-arm
 Maintainer: timi2506
 Filename: ./debs/com.timi2506.mypayindia-legacy_0.0.1_iphoneos-arm.deb
-Size: 11909742
-MD5sum: 8d3cff5db1b17ad3a2a6205fb047e531
-SHA1: b7fca7458950cfb30102e7347737424a9665e4b2
-SHA256: 24ae6c464ffec00ab124321a164531b91016f2a92c0a392ab3bc95a02d1c526d
+Size: 47509576
+MD5sum: 6c07bd597268f6fce445e45b7428b33f
+SHA1: aa5e6ef22f22e4232363f8c860a4e668f23811dc
+SHA256: dddee799e52fd2e273fa1cdfea8902e674d82f50ac70b3efa0cf54d926f04e96
 Section: Applications
 Description: MyPayIndia for your Legacy iOS Devices! Supports iOS 9 and higher
 Author: MyPayIndia <devteam@mypayindia.com>
