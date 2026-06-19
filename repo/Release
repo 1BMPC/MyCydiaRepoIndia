@@ -1,33 +1,33 @@
 Architectures: iphoneos-arm iphoneos-arm64 iphoneos-arm64e
 Codename: ios
 Components: main
-Date: Fri, 19 Jun 2026 18:46:09 +0000
+Date: Fri, 19 Jun 2026 21:02:58 +0000
 Description: The Official MyPayIndia Cydia Repository
 Label: MyRepoIndia
 Origin: MyRepoIndia
 Suite: stable
 Version: 1.0
 MD5Sum:
- 3bdea1e1bed70cd3f4cb7b8b216a3a1b             1298 Packages
- 83ce3559918f703f0dfb5040e296ed78              620 Packages.bz2
- 2a80d67877f06b9574829a97bbe250a2              531 Packages.gz
- be9c38abb4924f577e4965b7a719f553              592 Packages.xz
- 7f28cee692c8f04c31d3850d2e65b4c8              248 Release
+ eb4691b8e62b793fe47ee1e5c8e6d21b             2458 Packages
+ 4aca309ae80f4a73f2641ffb6c0a7d99              913 Packages.bz2
+ 34b02e3468d897500e6df38797fa7d8d              790 Packages.gz
+ 7bccbc80d0b1458241314fe98b809082              832 Packages.xz
+ add38dbbabcc90058821e19444142e08              248 Release
 SHA1:
- 42e7db351e14bd835e0617c5d98685824ac0ea01             1298 Packages
- 5ac3bd9b6d6d69b1ba920e535537387a65c8b011              620 Packages.bz2
- bd7bbc87e810a349f457704ae8bb14ae95051429              531 Packages.gz
- b1b52e4f1d44e6325f174b11824112287a7e9cd0              592 Packages.xz
- 6d1265085ca2c8a6f042b341a2cb35bc4159b2b7              248 Release
+ a6cdb8e3582f2af42fd12598c1fed8a2aab5aba2             2458 Packages
+ 72627f2f23cf43a85eedd232a4999839fd534973              913 Packages.bz2
+ e12d50d903cb62fc1ab1d90cba460bfd6aed9044              790 Packages.gz
+ 3d512612d09094ea2a3633a4b7f5249710bbd2df              832 Packages.xz
+ d9bf94d8627ce6202408bf75689828812fa4691c              248 Release
 SHA256:
- 8229119d10a439fff386960a4c6bc44d90d9b17c6accab8f42f6426cc254d0ef             1298 Packages
- 66a76f846ff5beeba59e1f047a564917afcb99d84b6b9fd1b8dcd84cf11b3436              620 Packages.bz2
- 5e5ef6b58cd79ee5026590621d604bf7f6cc9043e268ac748081d6966369c926              531 Packages.gz
- c1f65ce0c50144ec5f0b1879e2a90e2feefa171a377341b2a71ae5419a9c0414              592 Packages.xz
- 62626fd5757fa1596c79c4091a06477953797766ab5a36859df6f1a501a2fa64              248 Release
+ 3ea8cf4b58df70fbfb029909faaf771edc51ea4afeab9e15985e8f18f8e52bb2             2458 Packages
+ 380abf82a10a150a32c67cfc564dbcd89eba3768f3e39c2170e6ad7fb9371825              913 Packages.bz2
+ 489408d57907843adc4a71c11ed75536f8f21142d5a6b3323a69e96fc733be96              790 Packages.gz
+ 8a649ef4567b6194328933388e07492d20ec47d8f7a604cbda74788c53171166              832 Packages.xz
+ ddc990156d98f24ee8b6787dc10ca730afb4d9dc1ed267a1fe0d7dd3502e77fc              248 Release
 SHA512:
- 376dda527c183447de2bc42964e20dcfec7cb0340a32ccd34005ae36dfd2748b50fea579d45962ea5c09f287adb5787090129ee7f02b63fe1209d805a6cc288f             1298 Packages
- b19e5081caed8acca54e1caa7395c89589eb748d2cddd859b2820fb2066165a66db27ff78c23af70c367fcb99dba7b3a88df96f4d8e37615ae70b2c29ab496f1              620 Packages.bz2
- b128b61514f42bcfdbe45241daea97b47e9cd56b77f9308384d96f8c13db3b90961f27b14ca3c36869de87398c164e330020b24f734aefe2f885d45e495bb414              531 Packages.gz
- e18d17662f2af68ef4cbba67ebc691f620ef21899df2150147ccd1b81babcfb9c07386177b136560e3500526df397e0b14dcdbe586c91e4c1915b5d3167cc4e5              592 Packages.xz
- da7128e020a89fbbff8abd55f3ac626d544a6803f928c34d3df33b8171bcd4493987f25adc9ac0b89189cf361867390852b7a83718a396255ddacdb7ac12b07f              248 Release
+ d8402da57d13d6e33ff7f8dbb076efe89464d0238f47ab546d8c507d1bff33a36a57117461d04962325ff5f48084c2baccb0ecb6ea07d37e64baf5058e0802df             2458 Packages
+ 7b811f253e4c4bd4ac451b958cc3238a19eb7fab45aac0e32d34cd7fdd04e613e9dfcb224743c0c8b12edd06964c722a8e1ce39d70c820e9181ba11090068a11              913 Packages.bz2
+ a4f4758b474169b21e02a9ed4be72d5ae2a52f46ce7693e6220e166e0afa90948682a7f8e5580a80d4d48e49cda550ee2e948a0742da6a832e978ef73879b2fb              790 Packages.gz
+ e621f88d5e7e6ad99d20cf0cf3051996ddc4adb91a0754c7f86aa716db89c6ea83052c1f22a70ee445cadf2e25ca6dcbdab2cf689fef13664260afc7c5a9e832              832 Packages.xz
+ 2c76a1b9a9accc4c9d23253e514c9da9c328800fb60868ce630b476d921ee520fcc0e3c42b9b324b35eb29b7f6f85b8af8cc0c9f905e310678e6e3f26c9d2255              248 Release

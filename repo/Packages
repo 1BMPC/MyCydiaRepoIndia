@@ -1,3 +1,35 @@
+Package: com.mypayindia
+Version: 1.0.0
+Architecture: iphoneos-arm
+Maintainer: ibm_pc
+Filename: ./debs/com.mypayindia_1.0.0_iphoneos-arm.deb
+Size: 496366
+MD5sum: 9c7eadbef923ddd8aa50a255f6dfa3eb
+SHA1: 0bc99a4d315585d0179849be2b37974a2159c972
+SHA256: c60a763d0b5bd608ba90cdaa2781e9c9829483a8a915575412bf6ff0486d8d33
+Section: Applications
+Description: MyPayIndia Legacy² (iOS 3-6)
+Author: MyPayIndia <devteam@mypayindia.com>
+Depiction: https://cydia.mypayindia.com/assets/HuhnWaschen.png
+Icon: https://cydia.mypayindia.com/assets/MyPayIndia-Legacy.png
+Name: MyPayIndia Geriatric
+
+Package: com.mypayindia
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Maintainer: ibm_pc
+Filename: ./debs/com.mypayindia_1.0.0_iphoneos-arm64.deb
+Size: 496402
+MD5sum: da31ad99f2423379d2336c5254bf30ca
+SHA1: 09c8ea8e600c2323b1f51fe26cf7be31782e1f5c
+SHA256: 1e545acb88480ba7f6b12c55f7f8977f2723c91e3a895a31a7e0b0e912f7b6ea
+Section: Applications
+Description: MyPayIndia Legacy² (iOS 3-6)
+Author: MyPayIndia <devteam@mypayindia.com>
+Depiction: https://cydia.mypayindia.com/assets/HuhnWaschen.png
+Icon: https://cydia.mypayindia.com/assets/MyPayIndia-Legacy.png
+Name: MyPayIndia Geriatric
+
 Package: com.timi2506.mypayindia-legacy
 Version: 0.0.1
 Architecture: iphoneos-arm64
