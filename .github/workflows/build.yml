@@ -68,8 +68,9 @@ jobs:
               continue
             fi
             
-            # Check if there are actually files in the directory
-            if [ -z "$(ls -A "$APP_DIR_PATH")" ]; then
+            # Skip if there are no .zip, .ipa, or .app files in the directory
+            HAS_VALID_APP=$(find "$APP_DIR_PATH" -maxdepth 1 \( -name "*.zip" -o -name "*.ipa" -o -name "*.app" \) | head -1)
+            if [ -z "$HAS_VALID_APP" ]; then
               continue
             fi
             
@@ -78,8 +79,8 @@ jobs:
             
             CONFIG="configs/$NAME.plist"
             if [ ! -f "$CONFIG" ]; then
-              echo "::error::No config file found for $NAME at $CONFIG"
-              exit 1
+              echo "::warning title=Missing Config::No config file found for $NAME at $CONFIG"
+              continue
             fi
             
             # Create extraction directory
@@ -96,16 +97,16 @@ jobs:
               if [ -n "$ARCHIVE" ]; then
                 unzip -q "$ARCHIVE" -d "$APP_EXTRACT_DIR/"
               else
-                echo "::error::No valid input files found in $APP_DIR_PATH"
-                exit 1
+                echo "::warning title=Missing Input Files::No valid input files found in $APP_DIR_PATH"
+                continue
               fi
             fi
             
             # Now find the actual .app inside APP_EXTRACT_DIR
             APP_PATH=$(find "$APP_EXTRACT_DIR" -name "*.app" -type d | head -1)
             if [ -z "$APP_PATH" ]; then
-              echo "::error::No .app found after extracting $NAME"
-              exit 1
+              echo "::warning title=Missing App::No .app found after extracting $NAME"
+              continue
             fi
             APP_BUNDLE_NAME=$(basename "$APP_PATH" .app)
             
