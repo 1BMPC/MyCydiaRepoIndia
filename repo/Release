@@ -1,0 +1,33 @@
+Architectures: iphoneos-arm
+Codename: ios
+Components: main
+Date: Fri, 19 Jun 2026 18:13:12 +0000
+Description: My Custom Repository
+Label: My Repo
+Origin: My Repo
+Suite: stable
+Version: 1.0
+MD5Sum:
+ 48c432780012c9b956bb5545e0d70977              647 Packages
+ eb1a4ba3f054c02af9997f0ad6cac362              460 Packages.bz2
+ bc074fbdb47d976f343e9d7e8a7eef13              419 Packages.gz
+ d0524cd98bce1011aa1377e42217640b              488 Packages.xz
+ deee768e909c8e7fc5eecae95b42780f              189 Release
+SHA1:
+ 4a7c177166229f0ce7104605a361dcee3cb91372              647 Packages
+ a825c9b74df8c41400751a5172b8cc122b87608f              460 Packages.bz2
+ 0215d7a334520a15f900d1168a7c526fb133fbf4              419 Packages.gz
+ d2d87739f5d8f1e41f538a99723019c7c9bb4c8c              488 Packages.xz
+ 263a1de3ea6a2a1fad809b1ba278446e1e71ed5a              189 Release
+SHA256:
+ df8e22c5df894207e91cfeef7b7a54a98825a188699abf7f5d9d056fe510656d              647 Packages
+ b3d652b9e407c09633d2da9c30ad5fc20a1e426e13163317f7b7140dc442832d              460 Packages.bz2
+ 002e54ce2e80307233bfa37f30bd5455bfa23df690ff6574131a1f8b54997983              419 Packages.gz
+ 040a4fae6c1a0f8487fb2c687ff335f120bc19c2e155bb29394742f2c05ab01e              488 Packages.xz
+ d2f29f75d7242241c28f2b07421eacf56ea931e8e2aabffc3193bcd08b5dd261              189 Release
+SHA512:
+ 491eefbac1cfbb56a57df65c36e2360980da48047a6fa78c75b40337d330467c07ad8a678438dcd71b098f82796bd50a262c7cf33f61b1e820ddb7414dc3a118              647 Packages
+ c6a968fdc59dced4e9febbe3a11900a4b9caee81db8ec7f4b5438fcd81613aead791e37d644c31a2542076c1225c1d43ee6ad413c21c46c49c30f816e216241a              460 Packages.bz2
+ 8c3799cb877dd7d8df781547b92cf717882e21741e7b3fcb5c393ba09a142c9e0bb842a1d8bf69f8926ff6cd51236a87ebabb15a5fd7484d75f9900c38502ce6              419 Packages.gz
+ c40eb5d7a0dad3430adce9d469fa8c8d86ac36ddec573c73668274a60d4bbabd92fd7685844300214822fb22e66162361bc214129276f88c9e90d9418b42e77e              488 Packages.xz
+ fbc706bc93dcd1f3c4fba32bab7df204ee5b8bb39abcb8ac670a41ef1d61f48f80bac571728a1ddd9ac3fe6b27bb91e1dcbd9e76eb42bfea1922e6ef7c99875b              189 Release
