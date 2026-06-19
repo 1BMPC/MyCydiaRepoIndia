@@ -1,0 +1,2 @@
+# README
+This Folder is watched by GitHub Actions, ONLY put FINISHED .ipa, .zip files containing a .app or .app's here (ipa or zip preferred). the GitHub Action WILL automatically rebuild the repo with that new app file. Also make sure you put it in the correct folder, each folder inside this ./input folder here should also have a ./config/NAME.plist file that has the same name as the folder. For reference on how to create such a config.plist take a look at ./config/Template.plist, duplicate and edit if needed :D

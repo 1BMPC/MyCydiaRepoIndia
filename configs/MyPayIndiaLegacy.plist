@@ -12,5 +12,7 @@
 	<string>MyPayIndia &lt;devteam@mypayindia.com&gt;</string>
 	<key>Section</key>
 	<string>Applications</string>
+	<key>Icon URL</key>
+	<string>https://cydia.mypayindia.com/assets/MyPayIndia-Legacy.png</string>
 </dict>
 </plist>

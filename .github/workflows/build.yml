@@ -3,14 +3,15 @@ name: Build Deb and IPA
 on:
   push:
     paths:
-      - 'input/*.app.zip'
-      - 'input/*.zip'
-      - 'input/*.app/**'
+      - 'input/*/*.app.zip'
+      - 'input/*/*.zip'
+      - 'input/*/*.ipa'
+      - 'input/*/*.app/**'
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -19,118 +20,186 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
 
-      - name: Prepare app
-        id: prepare
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
+
+      - name: Process Apps
         run: |
-          mkdir -p /tmp/appextract
-          INPUT_FILE=""
-          APP_DIR=$(ls -d input/*.app 2>/dev/null | head -1)
+          mkdir -p repo/debs
+          mkdir -p assets
           
-          if [ -n "$APP_DIR" ]; then
-            cp -R "$APP_DIR" /tmp/appextract/
-            INPUT_FILE="$APP_DIR"
-          else
-            ZIP_FILE=$(ls input/*.app.zip input/*.zip 2>/dev/null | head -1)
-            if [ -n "$ZIP_FILE" ]; then
-              unzip -q "$ZIP_FILE" -d /tmp/appextract
-              INPUT_FILE="$ZIP_FILE"
-            else
+          # Function to read plist value using python3
+          read_plist() {
+            python3 -c "import plistlib, sys
+          try:
+              with open(sys.argv[1], 'rb') as f:
+                  p = plistlib.load(f)
+                  if isinstance(p, dict) and sys.argv[2] in p:
+                      print(p[sys.argv[2]])
+          except Exception:
+              pass" "$1" "$2"
+          }
+
+          # Function to read config with fallback to Template.plist
+          read_config() {
+            local KEY=$1
+            local PLIST=$2
+            local TEMPLATE="configs/Template.plist"
+            local NO_TEMPLATE=$3
+            
+            # Using absolute paths
+            local VAL=$(read_plist "$(pwd)/$PLIST" "$KEY")
+            if [ -z "$VAL" ] && [ "$NO_TEMPLATE" != "true" ] && [ -f "$TEMPLATE" ]; then
+              VAL=$(read_plist "$(pwd)/$TEMPLATE" "$KEY")
+            fi
+            echo "$VAL"
+          }
+
+          # Loop over all directories in input/
+          for APP_DIR_PATH in input/*/; do
+            # Remove trailing slash
+            APP_DIR_PATH=${APP_DIR_PATH%/}
+            NAME=$(basename "$APP_DIR_PATH")
+            
+            # Skip if not a directory
+            if [ ! -d "$APP_DIR_PATH" ]; then
+              continue
+            fi
+            
+            # Check if there are actually files in the directory
+            if [ -z "$(ls -A "$APP_DIR_PATH")" ]; then
+              continue
+            fi
+            
+            echo "======================================"
+            echo "Processing $NAME..."
+            
+            CONFIG="configs/$NAME.plist"
+            if [ ! -f "$CONFIG" ]; then
+              echo "::error::No config file found for $NAME at $CONFIG"
               exit 1
             fi
-          fi
-          
-          APP=$(find /tmp/appextract -maxdepth 2 -name "*.app" -type d | head -1)
-          APP_NAME=$(basename "$APP" .app)
-          
-          echo "input_file=$INPUT_FILE" >> $GITHUB_OUTPUT
-          echo "APP_PATH=$APP" >> $GITHUB_ENV
-          echo "APP_NAME=$APP_NAME" >> $GITHUB_ENV
-
-      - name: Read Info.plist
-        run: |
-          INFO="$APP_PATH/Info.plist"
-          BUNDLE_ID=$(defaults read "$INFO" CFBundleIdentifier 2>/dev/null || echo "")
-          VERSION=$(defaults read "$INFO" CFBundleShortVersionString 2>/dev/null || echo "")
-          BUNDLE_ID=${BUNDLE_ID:-com.timi2506.$APP_NAME}
-          VERSION=${VERSION:-1.0.0}
-          echo "BUNDLE_ID=$BUNDLE_ID" >> $GITHUB_ENV
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Read config.plist
-        run: |
-          CONFIG="$(pwd)/config.plist"
-          DEB_NAME=$(defaults read "$CONFIG" Name 2>/dev/null || echo "$APP_NAME")
-          DEB_DESC=$(defaults read "$CONFIG" Description 2>/dev/null || echo "$APP_NAME application")
-          DEB_MAINTAINER=$(defaults read "$CONFIG" Maintainer 2>/dev/null || echo "timi2506")
-          DEB_AUTHOR=$(defaults read "$CONFIG" Author 2>/dev/null || echo "timi2506")
-          DEB_SECTION=$(defaults read "$CONFIG" Section 2>/dev/null || echo "Applications")
-          echo "DEB_NAME=$DEB_NAME" >> $GITHUB_ENV
-          echo "DEB_DESC=$DEB_DESC" >> $GITHUB_ENV
-          echo "DEB_MAINTAINER=$DEB_MAINTAINER" >> $GITHUB_ENV
-          echo "DEB_AUTHOR=$DEB_AUTHOR" >> $GITHUB_ENV
-          echo "DEB_SECTION=$DEB_SECTION" >> $GITHUB_ENV
-
-      - name: Install dpkg
-        run: brew install dpkg
-
-      - name: Build deb
-        run: |
-          LOWER_ID=$(echo "$BUNDLE_ID" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9+._-')
-          DEB_FILENAME="${LOWER_ID}_${VERSION}_iphoneos-arm.deb"
-          BUILD_DIR="/tmp/deb_build"
-
-          mkdir -p "$BUILD_DIR/DEBIAN"
-          mkdir -p "$BUILD_DIR/Applications"
-
-          echo "Package: $LOWER_ID" > "$BUILD_DIR/DEBIAN/control"
-          echo "Name: $DEB_NAME" >> "$BUILD_DIR/DEBIAN/control"
-          echo "Version: $VERSION" >> "$BUILD_DIR/DEBIAN/control"
-          echo "Architecture: iphoneos-arm" >> "$BUILD_DIR/DEBIAN/control"
-          echo "Description: $DEB_DESC" >> "$BUILD_DIR/DEBIAN/control"
-          echo "Maintainer: $DEB_MAINTAINER" >> "$BUILD_DIR/DEBIAN/control"
-          echo "Author: $DEB_AUTHOR" >> "$BUILD_DIR/DEBIAN/control"
-          echo "Section: $DEB_SECTION" >> "$BUILD_DIR/DEBIAN/control"
-          echo "Icon: https://cydia.mypayindia.com/assets/MyPayIndia-Legacy.png" >> "$BUILD_DIR/DEBIAN/control"
-
-          printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$BUILD_DIR/DEBIAN/postinst"
-          printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$BUILD_DIR/DEBIAN/postrm"
-
-          cp -R "$APP_PATH" "$BUILD_DIR/Applications/"
-
-          find "$BUILD_DIR" -type d -exec chmod 0755 {} \;
-          find "$BUILD_DIR" -type f -exec chmod 0644 {} \;
-          chmod 0755 "$BUILD_DIR/DEBIAN/control"
-          chmod 0755 "$BUILD_DIR/DEBIAN/postinst"
-          chmod 0755 "$BUILD_DIR/DEBIAN/postrm"
-
-          if [ -f "$BUILD_DIR/Applications/$APP_NAME.app/$APP_NAME" ]; then
-            chmod 0755 "$BUILD_DIR/Applications/$APP_NAME.app/$APP_NAME"
-          fi
-          
-          mkdir -p repo/debs
-          dpkg-deb -Zgzip --root-owner-group -b "$BUILD_DIR" "repo/debs/$DEB_FILENAME"
-          echo "DEB_FILENAME=$DEB_FILENAME" >> $GITHUB_ENV
-
-      - name: Build IPA
-        run: |
-          BUILD_DIR="/tmp/ipa_build"
-          mkdir -p "$BUILD_DIR/Payload"
-          
-          cp -R "$APP_PATH" "$BUILD_DIR/Payload/"
-          
-          find "$BUILD_DIR/Payload" -type d -exec chmod 0755 {} \;
-          find "$BUILD_DIR/Payload" -type f -exec chmod 0644 {} \;
-          
-          if [ -f "$BUILD_DIR/Payload/$APP_NAME.app/$APP_NAME" ]; then
-            chmod 0755 "$BUILD_DIR/Payload/$APP_NAME.app/$APP_NAME"
-          fi
-
-          cd "$BUILD_DIR"
-          zip -qr latest.ipa Payload/
-          
-          cd ${{ github.workspace }}
-          mkdir -p assets
-          mv -f "$BUILD_DIR/latest.ipa" assets/latest.ipa
+            
+            # Create extraction directory
+            APP_EXTRACT_DIR="/tmp/appextract_$NAME"
+            rm -rf "$APP_EXTRACT_DIR"
+            mkdir -p "$APP_EXTRACT_DIR"
+            
+            # Find the app source (app folder or zip/ipa archive)
+            APP_SRC=$(find "$APP_DIR_PATH" -maxdepth 1 -name "*.app" -type d | head -1)
+            if [ -n "$APP_SRC" ]; then
+              cp -R "$APP_SRC" "$APP_EXTRACT_DIR/"
+            else
+              ARCHIVE=$(find "$APP_DIR_PATH" -maxdepth 1 -type f \( -name "*.zip" -o -name "*.ipa" \) | head -1)
+              if [ -n "$ARCHIVE" ]; then
+                unzip -q "$ARCHIVE" -d "$APP_EXTRACT_DIR/"
+              else
+                echo "::error::No valid input files found in $APP_DIR_PATH"
+                exit 1
+              fi
+            fi
+            
+            # Now find the actual .app inside APP_EXTRACT_DIR
+            APP_PATH=$(find "$APP_EXTRACT_DIR" -name "*.app" -type d | head -1)
+            if [ -z "$APP_PATH" ]; then
+              echo "::error::No .app found after extracting $NAME"
+              exit 1
+            fi
+            APP_BUNDLE_NAME=$(basename "$APP_PATH" .app)
+            
+            # Read Info.plist
+            INFO="$APP_PATH/Info.plist"
+            BUNDLE_ID=$(read_plist "$INFO" CFBundleIdentifier)
+            VERSION=$(read_plist "$INFO" CFBundleShortVersionString)
+            BUNDLE_ID=${BUNDLE_ID:-com.unknown.$APP_BUNDLE_NAME}
+            VERSION=${VERSION:-1.0.0}
+            
+            # Read configs
+            DEB_NAME=$(read_config "Name" "$CONFIG")
+            DEB_DESC=$(read_config "Description" "$CONFIG")
+            DEB_MAINTAINER=$(read_config "Maintainer" "$CONFIG")
+            DEB_AUTHOR=$(read_config "Author" "$CONFIG")
+            DEB_SECTION=$(read_config "Section" "$CONFIG")
+            ICON_URL=$(read_config "Icon URL" "$CONFIG" "true") # No template fallback
+            DETAIL_PAGE=$(read_config "DetailPage" "$CONFIG" "true") # Optional config, no template fallback
+            
+            DEB_NAME=${DEB_NAME:-$APP_BUNDLE_NAME}
+            DEB_DESC=${DEB_DESC:-$APP_BUNDLE_NAME application}
+            DEB_MAINTAINER=${DEB_MAINTAINER:-Unknown}
+            DEB_AUTHOR=${DEB_AUTHOR:-Unknown}
+            DEB_SECTION=${DEB_SECTION:-Applications}
+            
+            # Build Deb
+            LOWER_ID=$(echo "$BUNDLE_ID" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9+._-')
+            DEB_FILENAME="${LOWER_ID}_${VERSION}_iphoneos-arm.deb"
+            BUILD_DIR="/tmp/deb_build_$NAME"
+            rm -rf "$BUILD_DIR"
+            mkdir -p "$BUILD_DIR/DEBIAN"
+            mkdir -p "$BUILD_DIR/Applications"
+            
+            echo "Package: $LOWER_ID" > "$BUILD_DIR/DEBIAN/control"
+            echo "Name: $DEB_NAME" >> "$BUILD_DIR/DEBIAN/control"
+            echo "Version: $VERSION" >> "$BUILD_DIR/DEBIAN/control"
+            echo "Architecture: iphoneos-arm" >> "$BUILD_DIR/DEBIAN/control"
+            echo "Description: $DEB_DESC" >> "$BUILD_DIR/DEBIAN/control"
+            echo "Maintainer: $DEB_MAINTAINER" >> "$BUILD_DIR/DEBIAN/control"
+            echo "Author: $DEB_AUTHOR" >> "$BUILD_DIR/DEBIAN/control"
+            echo "Section: $DEB_SECTION" >> "$BUILD_DIR/DEBIAN/control"
+            if [ -n "$ICON_URL" ]; then
+              echo "Icon: $ICON_URL" >> "$BUILD_DIR/DEBIAN/control"
+            fi
+            if [ -n "$DETAIL_PAGE" ]; then
+              echo "Depiction: $DETAIL_PAGE" >> "$BUILD_DIR/DEBIAN/control"
+            fi
+            
+            printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$BUILD_DIR/DEBIAN/postinst"
+            printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$BUILD_DIR/DEBIAN/postrm"
+            
+            cp -R "$APP_PATH" "$BUILD_DIR/Applications/"
+            
+            find "$BUILD_DIR" -type d -exec chmod 0755 {} \;
+            find "$BUILD_DIR" -type f -exec chmod 0644 {} \;
+            chmod 0755 "$BUILD_DIR/DEBIAN/control"
+            chmod 0755 "$BUILD_DIR/DEBIAN/postinst"
+            chmod 0755 "$BUILD_DIR/DEBIAN/postrm"
+            
+            EXEC_NAME=$(read_plist "$INFO" CFBundleExecutable)
+            EXEC_NAME=${EXEC_NAME:-$APP_BUNDLE_NAME}
+            APP_EXEC="$BUILD_DIR/Applications/$(basename "$APP_PATH")/$EXEC_NAME"
+            if [ -f "$APP_EXEC" ]; then
+              chmod 0755 "$APP_EXEC"
+            fi
+            
+            dpkg-deb -Zgzip --root-owner-group -b "$BUILD_DIR" "repo/debs/$DEB_FILENAME"
+            echo "Built Deb: $DEB_FILENAME"
+            
+            # Build IPA
+            IPA_BUILD_DIR="/tmp/ipa_build_$NAME"
+            rm -rf "$IPA_BUILD_DIR"
+            mkdir -p "$IPA_BUILD_DIR/Payload"
+            
+            cp -R "$APP_PATH" "$IPA_BUILD_DIR/Payload/"
+            
+            find "$IPA_BUILD_DIR/Payload" -type d -exec chmod 0755 {} \;
+            find "$IPA_BUILD_DIR/Payload" -type f -exec chmod 0644 {} \;
+            
+            IPA_APP_EXEC="$IPA_BUILD_DIR/Payload/$(basename "$APP_PATH")/$EXEC_NAME"
+            if [ -f "$IPA_APP_EXEC" ]; then
+              chmod 0755 "$IPA_APP_EXEC"
+            fi
+            
+            cd "$IPA_BUILD_DIR"
+            zip -qr "${NAME}.ipa" Payload/
+            
+            cd "$GITHUB_WORKSPACE"
+            mv -f "$IPA_BUILD_DIR/${NAME}.ipa" "assets/${NAME}.ipa"
+            echo "Built IPA: assets/${NAME}.ipa"
+            
+            # Clear input folder contents but keep the folder
+            find "$APP_DIR_PATH" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+            
+            echo "Finished processing $NAME."
+          done
 
       - name: Update Packages index
         run: |
@@ -144,8 +213,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git rm -r "${{ steps.prepare.outputs.input_file }}"
-          git add repo/debs/ repo/Packages repo/Packages.bz2 repo/Packages.gz repo/Packages.xz assets/latest.ipa
+          git add repo/debs/ repo/Packages repo/Packages.bz2 repo/Packages.gz repo/Packages.xz assets/*.ipa input/
           git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "Build $DEB_FILENAME and latest.ipa, clean up input"
+          git commit -m "Build debs and ipas, update repo, clean up inputs"
           git push
