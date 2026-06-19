@@ -288,12 +288,12 @@ body {
     </div>
   </div>
 
-  <div class="section">
+    <div class="section">
     <div class="section-header">Repository URL</div>
     <div class="table-view">
-      <div class="table-cell">
+      <div class="table-cell" onclick="copyRepoUrl()" style="cursor: pointer;">
         <div class="cell-content">
-          <div class="cell-title">https://cydia.mypayindia.com/repo</div>
+          <div class="cell-title" id="repo-url-text">https://cydia.mypayindia.com/repo</div>
         </div>
       </div>
     </div>
@@ -341,12 +341,23 @@ function addToCydia() {
 
 function addToSileo() {
   window.location.href =
-    "sileo://source/" + encodeURIComponent(REPO);
+    "sileo://source/" + REPO;
 }
 
 function addToZebra() {
   window.location.href =
-    "zbra://sources/add/" + encodeURIComponent(REPO);
+    "zbra://sources/add/" + REPO;
+}
+
+function copyRepoUrl() {
+  navigator.clipboard.writeText(REPO).then(function() {
+    var urlText = document.getElementById("repo-url-text");
+    var originalText = urlText.innerText;
+    urlText.innerText = "Copied!";
+    setTimeout(function() {
+      urlText.innerText = originalText;
+    }, 1500);
+  });
 }
 
 window.onload = function() {

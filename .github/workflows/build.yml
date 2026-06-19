@@ -7,6 +7,7 @@ on:
       - 'input/*/*.zip'
       - 'input/*/*.ipa'
       - 'input/*/*.app/**'
+      - 'input/*/.configUpdateOnly'
   workflow_dispatch:
 
 jobs:
@@ -70,7 +71,12 @@ jobs:
             
             # Skip if there are no .zip, .ipa, or .app files in the directory
             HAS_VALID_APP=$(find "$APP_DIR_PATH" -maxdepth 1 \( -name "*.zip" -o -name "*.ipa" -o -name "*.app" \) | head -1)
-            if [ -z "$HAS_VALID_APP" ]; then
+            IS_CONFIG_UPDATE="false"
+            if [ -f "$APP_DIR_PATH/.configUpdateOnly" ]; then
+              IS_CONFIG_UPDATE="true"
+            fi
+            
+            if [ -z "$HAS_VALID_APP" ] && [ "$IS_CONFIG_UPDATE" = "false" ]; then
               continue
             fi
             
@@ -83,7 +89,77 @@ jobs:
               continue
             fi
             
-            # Create extraction directory
+            # Read configs
+            DEB_NAME=$(read_config "Name" "$CONFIG")
+            DEB_DESC=$(read_config "Description" "$CONFIG")
+            DEB_MAINTAINER=$(read_config "Maintainer" "$CONFIG")
+            DEB_AUTHOR=$(read_config "Author" "$CONFIG")
+            DEB_SECTION=$(read_config "Section" "$CONFIG")
+            ICON_URL=$(read_config "Icon URL" "$CONFIG" "true") # No template fallback
+            DETAIL_PAGE=$(read_config "DetailPage" "$CONFIG" "true") # Optional config, no template fallback
+            
+            DEB_NAME=${DEB_NAME:-$NAME}
+            DEB_DESC=${DEB_DESC:-$NAME application}
+            DEB_MAINTAINER=${DEB_MAINTAINER:-Unknown}
+            DEB_AUTHOR=${DEB_AUTHOR:-Unknown}
+            DEB_SECTION=${DEB_SECTION:-Applications}
+
+            if [ "$IS_CONFIG_UPDATE" = "true" ]; then
+              # Find existing deb by matching Name
+              OLD_DEB=""
+              for deb in repo/debs/*.deb; do
+                if [ -f "$deb" ]; then
+                  DEB_PKG_NAME=$(dpkg-deb -f "$deb" Name)
+                  if [ "$DEB_PKG_NAME" = "$DEB_NAME" ]; then
+                    OLD_DEB="$deb"
+                    break
+                  fi
+                fi
+              done
+              
+              if [ -z "$OLD_DEB" ]; then
+                echo "::warning title=Missing Deb::Could not find existing .deb matching Name '$DEB_NAME' for config update of $NAME."
+                continue
+              fi
+              
+              # Extract deb
+              BUILD_DIR="/tmp/deb_build_$NAME"
+              rm -rf "$BUILD_DIR"
+              mkdir -p "$BUILD_DIR"
+              dpkg-deb -R "$OLD_DEB" "$BUILD_DIR"
+              
+              # Read old properties that we must keep
+              OLD_PKG=$(grep "^Package: " "$BUILD_DIR/DEBIAN/control" | cut -d' ' -f2)
+              OLD_VER=$(grep "^Version: " "$BUILD_DIR/DEBIAN/control" | cut -d' ' -f2)
+              OLD_ARCH=$(grep "^Architecture: " "$BUILD_DIR/DEBIAN/control" | cut -d' ' -f2)
+              
+              # Rewrite control
+              echo "Package: $OLD_PKG" > "$BUILD_DIR/DEBIAN/control"
+              echo "Name: $DEB_NAME" >> "$BUILD_DIR/DEBIAN/control"
+              echo "Version: $OLD_VER" >> "$BUILD_DIR/DEBIAN/control"
+              echo "Architecture: $OLD_ARCH" >> "$BUILD_DIR/DEBIAN/control"
+              echo "Description: $DEB_DESC" >> "$BUILD_DIR/DEBIAN/control"
+              echo "Maintainer: $DEB_MAINTAINER" >> "$BUILD_DIR/DEBIAN/control"
+              echo "Author: $DEB_AUTHOR" >> "$BUILD_DIR/DEBIAN/control"
+              echo "Section: $DEB_SECTION" >> "$BUILD_DIR/DEBIAN/control"
+              if [ -n "$ICON_URL" ]; then
+                echo "Icon: $ICON_URL" >> "$BUILD_DIR/DEBIAN/control"
+              fi
+              if [ -n "$DETAIL_PAGE" ]; then
+                echo "Depiction: $DETAIL_PAGE" >> "$BUILD_DIR/DEBIAN/control"
+              fi
+              
+              dpkg-deb -Zgzip --root-owner-group -b "$BUILD_DIR" "$OLD_DEB"
+              echo "Updated config for Deb: $(basename "$OLD_DEB")"
+              
+              # Clear input folder contents
+              find "$APP_DIR_PATH" -mindepth 1 -maxdepth 1 ! -name ".gitkeep" -exec rm -rf {} +
+              
+              echo "Finished config update for $NAME."
+              continue
+            fi
+            
+            # Normal processing: Create extraction directory
             APP_EXTRACT_DIR="/tmp/appextract_$NAME"
             rm -rf "$APP_EXTRACT_DIR"
             mkdir -p "$APP_EXTRACT_DIR"
@@ -117,20 +193,12 @@ jobs:
             BUNDLE_ID=${BUNDLE_ID:-com.unknown.$APP_BUNDLE_NAME}
             VERSION=${VERSION:-1.0.0}
             
-            # Read configs
-            DEB_NAME=$(read_config "Name" "$CONFIG")
-            DEB_DESC=$(read_config "Description" "$CONFIG")
-            DEB_MAINTAINER=$(read_config "Maintainer" "$CONFIG")
-            DEB_AUTHOR=$(read_config "Author" "$CONFIG")
-            DEB_SECTION=$(read_config "Section" "$CONFIG")
-            ICON_URL=$(read_config "Icon URL" "$CONFIG" "true") # No template fallback
-            DETAIL_PAGE=$(read_config "DetailPage" "$CONFIG" "true") # Optional config, no template fallback
-            
-            DEB_NAME=${DEB_NAME:-$APP_BUNDLE_NAME}
-            DEB_DESC=${DEB_DESC:-$APP_BUNDLE_NAME application}
-            DEB_MAINTAINER=${DEB_MAINTAINER:-Unknown}
-            DEB_AUTHOR=${DEB_AUTHOR:-Unknown}
-            DEB_SECTION=${DEB_SECTION:-Applications}
+            if [ "$DEB_NAME" = "$NAME" ]; then
+              DEB_NAME="$APP_BUNDLE_NAME"
+            fi
+            if [ "$DEB_DESC" = "$NAME application" ]; then
+              DEB_DESC="$APP_BUNDLE_NAME application"
+            fi
             
             # Build Deb
             LOWER_ID=$(echo "$BUNDLE_ID" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9+._-')
