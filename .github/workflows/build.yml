@@ -281,7 +281,7 @@ jobs:
           xz -c9 Packages > Packages.xz
           
           # Generate Release file required by Sileo and others
-          apt-ftparchive release -o APT::FTPArchive::Release::Origin="My Repo" -o APT::FTPArchive::Release::Label="My Repo" -o APT::FTPArchive::Release::Suite="stable" -o APT::FTPArchive::Release::Version="1.0" -o APT::FTPArchive::Release::Codename="ios" -o APT::FTPArchive::Release::Architectures="iphoneos-arm" -o APT::FTPArchive::Release::Components="main" -o APT::FTPArchive::Release::Description="My Custom Repository" . > Release
+          apt-ftparchive release -o APT::FTPArchive::Release::Origin="My Repo" -o APT::FTPArchive::Release::Label="My Repo" -o APT::FTPArchive::Release::Suite="stable" -o APT::FTPArchive::Release::Version="1.0" -o APT::FTPArchive::Release::Codename="ios" -o APT::FTPArchive::Release::Architectures="iphoneos-arm iphoneos-arm64 iphoneos-arm64e" -o APT::FTPArchive::Release::Components="main" -o APT::FTPArchive::Release::Description="My Custom Repository" . > Release
 
       - name: Commit and push
         run: |
