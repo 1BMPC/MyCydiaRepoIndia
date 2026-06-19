@@ -24,7 +24,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev apt-utils
 
       - name: Process Apps
         run: |
@@ -279,12 +279,15 @@ jobs:
           bzip2 -c Packages > Packages.bz2
           gzip -c9 Packages > Packages.gz
           xz -c9 Packages > Packages.xz
+          
+          # Generate Release file required by Sileo and others
+          apt-ftparchive release -o APT::FTPArchive::Release::Origin="My Repo" -o APT::FTPArchive::Release::Label="My Repo" -o APT::FTPArchive::Release::Suite="stable" -o APT::FTPArchive::Release::Version="1.0" -o APT::FTPArchive::Release::Codename="ios" -o APT::FTPArchive::Release::Architectures="iphoneos-arm" -o APT::FTPArchive::Release::Components="main" -o APT::FTPArchive::Release::Description="My Custom Repository" . > Release
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add repo/debs/ repo/Packages repo/Packages.bz2 repo/Packages.gz repo/Packages.xz assets/*.ipa input/
+          git add repo/debs/ repo/Packages repo/Packages.bz2 repo/Packages.gz repo/Packages.xz repo/Release assets/*.ipa input/
           git diff --cached --quiet && echo "No changes" && exit 0
           git commit -m "Build debs and ipas, update repo, clean up inputs"
           git push
