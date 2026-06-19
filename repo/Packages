@@ -1,12 +1,28 @@
 Package: com.timi2506.mypayindia-legacy
 Version: 0.0.1
+Architecture: iphoneos-arm64
+Maintainer: timi2506
+Filename: ./debs/com.timi2506.mypayindia-legacy_0.0.1_iphoneos-arm64.deb
+Size: 47509840
+MD5sum: 47f18334ad47ef0418571ccb117279b8
+SHA1: 854015d6c22f4f880f75ce196ab76317b8c4df7c
+SHA256: ee9d1c713381545dfca42a788c7873d4a7626693bca7e1e30a2c3d2e4a308fc2
+Section: Applications
+Description: MyPayIndia for your Legacy iOS Devices! Supports iOS 9 and higher
+Author: MyPayIndia <devteam@mypayindia.com>
+Depiction: https://cydia.mypayindia.com/assets/HuhnWaschen.png
+Icon: https://cydia.mypayindia.com/assets/MyPayIndia-Legacy.png
+Name: MyPayIndia Legacy
+
+Package: com.timi2506.mypayindia-legacy
+Version: 0.0.1
 Architecture: iphoneos-arm
 Maintainer: timi2506
 Filename: ./debs/com.timi2506.mypayindia-legacy_0.0.1_iphoneos-arm.deb
-Size: 47509616
-MD5sum: 1157a9a037439afb8cddb43b984659e8
-SHA1: 68a9880cea38e4854e31cfecb285f26fcbb79597
-SHA256: 805f9eabc29d4964a3151a6c11b28e2048af3bf814445aa6e712a54c3b1afbb5
+Size: 47509602
+MD5sum: e214fe3824b49d5cb0e597f1a9486578
+SHA1: 8bf66ce390413dd50fd4f0458bde8f42e864ac01
+SHA256: fd1d3cbda3c8ea260f0e6d6e0eaf92ab397778ea923492096f8e6d904c4c9390
 Section: Applications
 Description: MyPayIndia for your Legacy iOS Devices! Supports iOS 9 and higher
 Author: MyPayIndia <devteam@mypayindia.com>
