@@ -14,5 +14,7 @@
 	<string>Applications</string>
 	<key>Icon URL</key>
 	<string>https://cydia.mypayindia.com/assets/MyPayIndia-Legacy.png</string>
+	<key>DetailPage</key>
+	<string>https://cydia.mypayindia.com/assets/HuhnWaschen.png</string>
 </dict>
 </plist>
