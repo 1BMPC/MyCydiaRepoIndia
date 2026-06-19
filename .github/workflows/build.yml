@@ -195,8 +195,8 @@ jobs:
             mv -f "$IPA_BUILD_DIR/${NAME}.ipa" "assets/${NAME}.ipa"
             echo "Built IPA: assets/${NAME}.ipa"
             
-            # Clear input folder contents but keep the folder
-            find "$APP_DIR_PATH" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+            # Clear input folder contents but keep the folder and .gitkeep
+            find "$APP_DIR_PATH" -mindepth 1 -maxdepth 1 ! -name ".gitkeep" -exec rm -rf {} +
             
             echo "Finished processing $NAME."
           done
