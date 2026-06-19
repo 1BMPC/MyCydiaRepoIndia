@@ -105,52 +105,51 @@ jobs:
             DEB_SECTION=${DEB_SECTION:-Applications}
 
             if [ "$IS_CONFIG_UPDATE" = "true" ]; then
-              # Find existing deb by matching Name
-              OLD_DEB=""
-              for deb in repo/debs/*.deb; do
-                if [ -f "$deb" ]; then
-                  DEB_PKG_NAME=$(dpkg-deb -f "$deb" Name)
+              # Find existing debs by matching Name
+              FOUND_DEB="false"
+              for OLD_DEB in repo/debs/*.deb; do
+                if [ -f "$OLD_DEB" ]; then
+                  DEB_PKG_NAME=$(dpkg-deb -f "$OLD_DEB" Name)
                   if [ "$DEB_PKG_NAME" = "$DEB_NAME" ]; then
-                    OLD_DEB="$deb"
-                    break
+                    FOUND_DEB="true"
+                    
+                    # Extract deb
+                    BUILD_DIR="/tmp/deb_build_$NAME"
+                    rm -rf "$BUILD_DIR"
+                    mkdir -p "$BUILD_DIR"
+                    dpkg-deb -R "$OLD_DEB" "$BUILD_DIR"
+                    
+                    # Read old properties that we must keep
+                    OLD_PKG=$(grep "^Package: " "$BUILD_DIR/DEBIAN/control" | cut -d' ' -f2)
+                    OLD_VER=$(grep "^Version: " "$BUILD_DIR/DEBIAN/control" | cut -d' ' -f2)
+                    OLD_ARCH=$(grep "^Architecture: " "$BUILD_DIR/DEBIAN/control" | cut -d' ' -f2)
+                    
+                    # Rewrite control
+                    echo "Package: $OLD_PKG" > "$BUILD_DIR/DEBIAN/control"
+                    echo "Name: $DEB_NAME" >> "$BUILD_DIR/DEBIAN/control"
+                    echo "Version: $OLD_VER" >> "$BUILD_DIR/DEBIAN/control"
+                    echo "Architecture: $OLD_ARCH" >> "$BUILD_DIR/DEBIAN/control"
+                    echo "Description: $DEB_DESC" >> "$BUILD_DIR/DEBIAN/control"
+                    echo "Maintainer: $DEB_MAINTAINER" >> "$BUILD_DIR/DEBIAN/control"
+                    echo "Author: $DEB_AUTHOR" >> "$BUILD_DIR/DEBIAN/control"
+                    echo "Section: $DEB_SECTION" >> "$BUILD_DIR/DEBIAN/control"
+                    if [ -n "$ICON_URL" ]; then
+                      echo "Icon: $ICON_URL" >> "$BUILD_DIR/DEBIAN/control"
+                    fi
+                    if [ -n "$DETAIL_PAGE" ]; then
+                      echo "Depiction: $DETAIL_PAGE" >> "$BUILD_DIR/DEBIAN/control"
+                    fi
+                    
+                    dpkg-deb -Zgzip --root-owner-group -b "$BUILD_DIR" "$OLD_DEB"
+                    echo "Updated config for Deb: $(basename "$OLD_DEB")"
                   fi
                 fi
               done
               
-              if [ -z "$OLD_DEB" ]; then
+              if [ "$FOUND_DEB" = "false" ]; then
                 echo "::warning title=Missing Deb::Could not find existing .deb matching Name '$DEB_NAME' for config update of $NAME."
                 continue
               fi
-              
-              # Extract deb
-              BUILD_DIR="/tmp/deb_build_$NAME"
-              rm -rf "$BUILD_DIR"
-              mkdir -p "$BUILD_DIR"
-              dpkg-deb -R "$OLD_DEB" "$BUILD_DIR"
-              
-              # Read old properties that we must keep
-              OLD_PKG=$(grep "^Package: " "$BUILD_DIR/DEBIAN/control" | cut -d' ' -f2)
-              OLD_VER=$(grep "^Version: " "$BUILD_DIR/DEBIAN/control" | cut -d' ' -f2)
-              OLD_ARCH=$(grep "^Architecture: " "$BUILD_DIR/DEBIAN/control" | cut -d' ' -f2)
-              
-              # Rewrite control
-              echo "Package: $OLD_PKG" > "$BUILD_DIR/DEBIAN/control"
-              echo "Name: $DEB_NAME" >> "$BUILD_DIR/DEBIAN/control"
-              echo "Version: $OLD_VER" >> "$BUILD_DIR/DEBIAN/control"
-              echo "Architecture: $OLD_ARCH" >> "$BUILD_DIR/DEBIAN/control"
-              echo "Description: $DEB_DESC" >> "$BUILD_DIR/DEBIAN/control"
-              echo "Maintainer: $DEB_MAINTAINER" >> "$BUILD_DIR/DEBIAN/control"
-              echo "Author: $DEB_AUTHOR" >> "$BUILD_DIR/DEBIAN/control"
-              echo "Section: $DEB_SECTION" >> "$BUILD_DIR/DEBIAN/control"
-              if [ -n "$ICON_URL" ]; then
-                echo "Icon: $ICON_URL" >> "$BUILD_DIR/DEBIAN/control"
-              fi
-              if [ -n "$DETAIL_PAGE" ]; then
-                echo "Depiction: $DETAIL_PAGE" >> "$BUILD_DIR/DEBIAN/control"
-              fi
-              
-              dpkg-deb -Zgzip --root-owner-group -b "$BUILD_DIR" "$OLD_DEB"
-              echo "Updated config for Deb: $(basename "$OLD_DEB")"
               
               # Clear input folder contents
               find "$APP_DIR_PATH" -mindepth 1 -maxdepth 1 ! -name ".gitkeep" -exec rm -rf {} +
@@ -244,6 +243,47 @@ jobs:
             dpkg-deb -Zgzip --root-owner-group -b "$BUILD_DIR" "repo/debs/$DEB_FILENAME"
             echo "Built Deb: $DEB_FILENAME"
             
+            # Build Rootless Deb
+            ROOTLESS_DEB_FILENAME="${LOWER_ID}_${VERSION}_iphoneos-arm64.deb"
+            ROOTLESS_BUILD_DIR="/tmp/deb_build_rootless_$NAME"
+            rm -rf "$ROOTLESS_BUILD_DIR"
+            mkdir -p "$ROOTLESS_BUILD_DIR/DEBIAN"
+            mkdir -p "$ROOTLESS_BUILD_DIR/var/jb/Applications"
+            
+            echo "Package: $LOWER_ID" > "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            echo "Name: $DEB_NAME" >> "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            echo "Version: $VERSION" >> "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            echo "Architecture: iphoneos-arm64" >> "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            echo "Description: $DEB_DESC" >> "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            echo "Maintainer: $DEB_MAINTAINER" >> "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            echo "Author: $DEB_AUTHOR" >> "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            echo "Section: $DEB_SECTION" >> "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            if [ -n "$ICON_URL" ]; then
+              echo "Icon: $ICON_URL" >> "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            fi
+            if [ -n "$DETAIL_PAGE" ]; then
+              echo "Depiction: $DETAIL_PAGE" >> "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            fi
+            
+            printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$ROOTLESS_BUILD_DIR/DEBIAN/postinst"
+            printf '#!/bin/sh\nsu -c uicache mobile\nexit 0\n' > "$ROOTLESS_BUILD_DIR/DEBIAN/postrm"
+            
+            cp -R "$APP_PATH" "$ROOTLESS_BUILD_DIR/var/jb/Applications/"
+            
+            find "$ROOTLESS_BUILD_DIR" -type d -exec chmod 0755 {} \;
+            find "$ROOTLESS_BUILD_DIR" -type f -exec chmod 0644 {} \;
+            chmod 0755 "$ROOTLESS_BUILD_DIR/DEBIAN/control"
+            chmod 0755 "$ROOTLESS_BUILD_DIR/DEBIAN/postinst"
+            chmod 0755 "$ROOTLESS_BUILD_DIR/DEBIAN/postrm"
+            
+            ROOTLESS_APP_EXEC="$ROOTLESS_BUILD_DIR/var/jb/Applications/$(basename "$APP_PATH")/$EXEC_NAME"
+            if [ -f "$ROOTLESS_APP_EXEC" ]; then
+              chmod 0755 "$ROOTLESS_APP_EXEC"
+            fi
+            
+            dpkg-deb -Zgzip --root-owner-group -b "$ROOTLESS_BUILD_DIR" "repo/debs/$ROOTLESS_DEB_FILENAME"
+            echo "Built Rootless Deb: $ROOTLESS_DEB_FILENAME"
+            
             # Build IPA
             IPA_BUILD_DIR="/tmp/ipa_build_$NAME"
             rm -rf "$IPA_BUILD_DIR"
@@ -281,7 +321,7 @@ jobs:
           xz -c9 Packages > Packages.xz
           
           # Generate Release file required by Sileo and others
-          apt-ftparchive release -o APT::FTPArchive::Release::Origin="My Repo" -o APT::FTPArchive::Release::Label="My Repo" -o APT::FTPArchive::Release::Suite="stable" -o APT::FTPArchive::Release::Version="1.0" -o APT::FTPArchive::Release::Codename="ios" -o APT::FTPArchive::Release::Architectures="iphoneos-arm iphoneos-arm64 iphoneos-arm64e" -o APT::FTPArchive::Release::Components="main" -o APT::FTPArchive::Release::Description="My Custom Repository" . > Release
+          apt-ftparchive release -o APT::FTPArchive::Release::Origin="MyRepoIndia" -o APT::FTPArchive::Release::Label="MyRepoIndia" -o APT::FTPArchive::Release::Suite="stable" -o APT::FTPArchive::Release::Version="1.0" -o APT::FTPArchive::Release::Codename="ios" -o APT::FTPArchive::Release::Architectures="iphoneos-arm iphoneos-arm64 iphoneos-arm64e" -o APT::FTPArchive::Release::Components="main" -o APT::FTPArchive::Release::Description="The Official MyPayIndia Cydia Repository" . > Release
 
       - name: Commit and push
         run: |
